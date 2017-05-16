@@ -45,6 +45,7 @@ public:
 	afx_msg void OnUpdateImgproc(CCmdUI *pCmdUI);
 	afx_msg void OnInfomanage();
 	afx_msg void OnUpdateInfomanage(CCmdUI *pCmdUI);
+	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 };
 
 

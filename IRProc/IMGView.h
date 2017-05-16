@@ -27,6 +27,16 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedOpen();
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	virtual void OnInitialUpdate();
+
+	void SetControlInfo(WORD CtrlID);
+	void OnMySize(UINT nType, int cx, int cy);
+protected:
+
+	int m_old_cx, m_old_cy;
+
+	CDWordArray m_control_info;
 };
 
 

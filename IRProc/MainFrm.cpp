@@ -26,6 +26,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_IMGProc, &CMainFrame::OnUpdateImgproc)
 	ON_COMMAND(ID_INFOManage, &CMainFrame::OnInfomanage)
 	ON_UPDATE_COMMAND_UI(ID_INFOManage, &CMainFrame::OnUpdateInfomanage)
+	ON_WM_GETMINMAXINFO()
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -81,6 +82,10 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 		return FALSE;
 	// TODO:  在此处通过修改
 	//  CREATESTRUCT cs 来修改窗口类或样式
+	cs.x = 0;
+	cs.y = 0;
+	//cs.style &= ~WS_MAXIMIZEBOX;
+	//cs.style &= ~WS_SIZEBOX;
 
 	return TRUE;
 }
@@ -223,6 +228,9 @@ void CMainFrame::OnImgproc()
 	if (GetActiveView()->IsKindOf(RUNTIME_CLASS(CIMGView)))
 		return;
 	SwitchToForm(IDD_IMG);
+	CIMGView *p = (CIMGView *)GetDlgItem(IDD_IMG);
+	p->OnBnClickedOpen();
+
 }
 
 
@@ -247,4 +255,25 @@ void CMainFrame::OnUpdateInfomanage(CCmdUI *pCmdUI)
 {
 	// TODO:  在此添加命令更新用户界面处理程序代码
 	pCmdUI->SetCheck(GetActiveView()->IsKindOf(RUNTIME_CLASS(CIRProcView)));
+}
+
+
+void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
+{
+	// TODO:  在此添加消息处理程序代码和/或调用默认值
+	int cx = GetSystemMetrics(SM_CXSCREEN);
+
+	int cy = GetSystemMetrics(SM_CYSCREEN);
+
+	lpMMI->ptMinTrackSize.x = cx;
+
+	lpMMI->ptMaxTrackSize.x = cx;
+
+	lpMMI->ptMaxTrackSize.y = cy;
+
+	lpMMI->ptMinTrackSize.y = cy;
+
+
+	CFrameWnd::OnGetMinMaxInfo(lpMMI);
+
 }

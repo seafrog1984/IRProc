@@ -145,7 +145,10 @@ BEGIN
             END
         END
     END
-    MENUITEM "图像处理",                        ID_IMGProc
+    POPUP "图像处理"
+    BEGIN
+        MENUITEM "打开图像",                        ID_IMGProc
+    END
     MENUITEM "信息管理",                        ID_INFOManage
     MENUITEM "系统设置",                        0
     POPUP "帮助(&H)"
@@ -210,12 +213,12 @@ BEGIN
     LTEXT           "TODO:  将窗体控件放置在此对话框上。",IDC_STATIC,24,42,280,8
 END
 
-IDD_IMG DIALOGEX 0, 0, 309, 178
+IDD_IMG DIALOGEX 0, 0, 805, 371
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "",IDC_PIC,"Static",SS_BLACKFRAME,7,7,191,164
-    PUSHBUTTON      "打开图像",IDC_OPEN,217,18,50,14
+    CONTROL         "",IDC_PIC,"Static",SS_BLACKFRAME,7,7,191,357
+    PUSHBUTTON      "打开图像",IDC_OPEN,217,18,50,14,NOT WS_VISIBLE
 END
 
 
@@ -285,9 +288,9 @@ BEGIN
     IDD_IMG, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 302
+        RIGHTMARGIN, 798
         TOPMARGIN, 7
-        BOTTOMMARGIN, 171
+        BOTTOMMARGIN, 364
     END
 END
 #endif    // APSTUDIO_INVOKED

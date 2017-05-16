@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "IRProc.h"
 #include "IMGView.h"
+#include "IRProcDoc.h"
 #include <fstream>
 
 #include <opencv2/core/core.hpp>
@@ -35,6 +36,7 @@ void CIMGView::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CIMGView, CFormView)
 	ON_BN_CLICKED(IDC_OPEN, &CIMGView::OnBnClickedOpen)
+	ON_WM_CREATE()
 END_MESSAGE_MAP()
 
 
@@ -85,8 +87,8 @@ void CIMGView::OnBnClickedOpen()
 	fin.close();
 
 	Mat src(height, width, CV_8UC1, tmp);
-	namedWindow("src");
-	imshow("src", src);
+	//namedWindow("src");
+	//imshow("src", src);
 	Mat img;
 	//	img.create(height, width, CV_16UC1, tmp);
 	src.copyTo(img);
@@ -156,6 +158,9 @@ void CIMGView::OnBnClickedOpen()
 				row = i / width;
 				col = i%width;
 				g_dst.at<uchar>(row, col) = displayValue;
+				dst.at<Vec3b>(row, col)[0] = 0;
+				dst.at<Vec3b>(row, col)[1] = 0;
+				dst.at<Vec3b>(row, col)[2] = displayValue;
 			}
 		}
 	}
@@ -169,14 +174,123 @@ void CIMGView::OnBnClickedOpen()
 	//		dst.at<Vec3b>(i, j)[0] = 101.2 - 116.2*cos(tmp*0.08655) + 91.93*sin(tmp*0.08592);
 	//		dst.at<Vec3b>(i, j)[1] = 150.9 - 110.9*cos(tmp*0.08457) - 97.33*sin(tmp*0.08457);
 	//		dst.at<Vec3b>(i, j)[2] = 125.3 + 59.93*cos(tmp*0.04896) - 130.2*sin(tmp*0.04896);
-
-
 	//	}
 	//}
 
-	namedWindow("test");
-
+	namedWindow("test", WINDOW_AUTOSIZE);
+	
 	imshow("test", g_dst);
 
+	//新建一个名为expanded的Mat容器。高度和img1相同，宽度为两倍  
+	Mat expanded(Size((dst.cols + dst.cols), dst.rows), CV_8UC3);
+	
+	Mat ROI = expanded(Rect(0, 0, dst.cols, dst.rows));
+	
+	Mat ROI1 = expanded(Rect(dst.cols, 0, dst.cols, dst.rows));
+	//cout << "ROI1.cols" << ROI1.cols << endl;  
+	//cout << "ROI1.rows" << ROI1.rows << endl;  
+	addWeighted(ROI, 0, dst, 1, 0., ROI);
+
+	addWeighted(ROI1, 0, dst, 1, 0., ROI1);
+
+	namedWindow("picture");
+	imshow("picture", expanded);
+
+
+	
+
+	
+}
+
+
+int CIMGView::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	if (CFormView::OnCreate(lpCreateStruct) == -1)
+		return -1;
+
+	// TODO:  在此添加您专用的创建代码
+
+	CRect rect;
+	GetWindowRect(rect);
+	GetDlgItem(IDC_PIC)->MoveWindow(rect.left, rect.top, rect.Width()/2, rect.Height()/2, true);
+
+	return 0;
+}
+
+
+void CIMGView::OnInitialUpdate()
+{
+	CFormView::OnInitialUpdate();
+
+	// TODO:  在此添加专用代码和/或调用基类
+	CSize sz = GetTotalSize();
+
+	m_old_cx = sz.cx;
+
+	m_old_cy = sz.cy;
+
+	SetControlInfo(IDC_PIC);
+}
+void CIMGView::SetControlInfo(WORD CtrlID){
+
+	m_control_info.Add(CtrlID);
+	OnMySize(IDC_PIC,800,600);
+
+}
+void CIMGView::OnMySize(UINT nType, int cx, int cy)
+{
+
+	if (cx == 0 || cy == 0)
+	{
+
+		cx = GetTotalSize().cx/2;
+
+		cy = GetTotalSize().cy/2;
+
+	}
+
+	float dx_percent = (m_old_cx == 0) ? 1 : (float)((float)cx / (float)m_old_cx);
+
+	float dy_percent = (m_old_cy == 0) ? 1 : (float)((float)cy / (float)m_old_cy);
+
+	if (m_old_cx){
+
+		CRect WndRect;
+
+		CWnd * pWnd;
+
+		for (int i = 0; i<m_control_info.GetSize(); i++){
+
+			pWnd = GetDlgItem(m_control_info[i]);
+
+			if (!pWnd){
+
+				TRACE(_T("Control ID-%dNot"), m_control_info[i]);
+
+				continue;
+
+			}
+
+			pWnd->GetWindowRect(&WndRect);
+
+			ScreenToClient(&WndRect);
+
+			WndRect.left = (int)(WndRect.left*dx_percent);
+
+			WndRect.right = (int)(WndRect.right*dx_percent);
+
+			WndRect.top = (int)(WndRect.top*dy_percent);
+
+			WndRect.bottom = (int)(WndRect.bottom*dy_percent);
+
+			pWnd->MoveWindow(&WndRect);
+
+		}
+
+	}
+
+	m_old_cx = cx;
+
+	m_old_cy = cy;
 
 }
